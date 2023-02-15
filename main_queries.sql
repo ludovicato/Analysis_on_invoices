@@ -219,6 +219,22 @@ ORDER BY number_invoices DESC
 LIMIT 10;
 
 
+--number of distinct regions that the top 10 suppliers work with
+WITH amount_per_supplier AS (
+	SELECT DISTINCT supplier, SUM(invoice_amount)
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+	ORDER BY SUM(invoice_amount) DESC
+	LIMIT 10
+)
+SELECT DISTINCT a.supplier, COUNT(DISTINCT region)
+FROM blacksmiths_in_westeros AS b
+JOIN amount_per_supplier AS a 
+ON b.supplier = a.supplier
+GROUP BY a.supplier
+ORDER BY count DESC; 
+
+
 --Distribution of total imports through time
 SELECT invoice_date, ROUND(AVG(invoice_amount),2) as avg_invoice_amount
 FROM blacksmiths_in_westeros
@@ -266,6 +282,18 @@ GROUP BY b.region, r.population
 ORDER BY invoice_amount_per_person DESC;
 
 
---
-
+--identify the top suppliers by total invoice value that have sold their products in 1 region, while also including their ranking by invoice amount
+WITH ranked_data AS (
+	SELECT 
+		supplier, 
+		ROUND(SUM(invoice_amount)) AS total_amount, 
+		COUNT(DISTINCT region) AS regions,
+		row_number() OVER (ORDER BY SUM(invoice_amount) DESC) AS ranking
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+)
+SELECT supplier, total_amount, ranking
+FROM ranked_data
+WHERE regions = 1
+ORDER BY ranking;
 
