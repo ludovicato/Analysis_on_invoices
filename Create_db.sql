@@ -32,7 +32,7 @@ VALUES
 	(12, 'Mance Rayder', 'VAT234567', 'TAX890123', 'The North', 'Frostfangs', 'Castle Black', 1012, 'INV1012', '2022-01-12', 100.00, 'Arryn', 'TAX890123'),
 	(13, 'Hal Mollen', 'VAT789012', 'TAX456789', 'The Riverlands', 'Riverrun', 'Riverrun', 1013, 'INV1013', '2022-01-13', 800.00, 'Martell', 'TAX901465'),
 	(14, 'Vayon Poole', 'VAT345678', 'TAX901234', 'The North', 'Winterfell', 'Winterfell', 1014, 'INV1014', '2022-01-14', 150.00, 'Stark', 'TAX345678'),
-	(15, 'Miklaz', 'VAT456012', 'TAX789123', 'The Iron Islands', 'Pyke', 'Pyke', 1015, 'INV1015', '2022-01-15', 450.00, 'Greyjoy', 'TAX012345');
+	(15, 'Harys Swyft', 'VAT456012', 'TAX789123', 'The Iron Islands', 'Pyke', 'Pyke', 1015, 'INV1015', '2022-01-15', 450.00, 'Greyjoy', 'TAX012345');
 
 
 --Create the database
