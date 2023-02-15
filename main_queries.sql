@@ -48,6 +48,20 @@ FROM blacksmiths_in_westeros
 GROUP BY region;
 
 
+--number of invoices per blacksmith in each region 
+SELECT DISTINCT region, ROUND(SUM(invoice_amount)/COUNT(DISTINCT blacksmith_id)) AS invoices
+FROM blacksmiths_in_westeros
+GROUP BY region
+ORDER BY invoices DESC;
+
+
+--average invoice amount per blacksmith for each region
+SELECT region, ROUND(AVG(invoice_amount)) AS avg_invoice_amount_per_blacksmith
+FROM blacksmiths_in_westeros
+GROUP BY region
+ORDER BY avg_invoice_amount_per_blacksmith DESC;
+
+
 --Check total number of invoices by city
 SELECT city, count(*)
 FROM blacksmiths_in_westeros
@@ -56,10 +70,23 @@ ORDER BY count DESC;
 
 
 --Check total invoice amount by region
-SELECT region, SUM(invoice_amount) as total_amount
+SELECT DISTINCT region, ROUND(SUM(invoice_amount)/1000000) || ' M' AS round_amount
 FROM blacksmiths_in_westeros
 GROUP BY region
-ORDER BY total_amount DESC;
+ORDER BY round_amount DESC;
+
+
+--average number of invoices by blacksmiths for each region
+SELECT DISTINCT region, COUNT(*)/COUNT(DISTINCT blacksmith_id) AS invoices_by_blacksmith
+FROM blacksmiths_in_westeros
+GROUP BY region
+ORDER BY invoices_by_blacksmith DESC;
+
+--same as above, but with different method
+SELECT DISTINCT region, ROUND(AVG(COUNT(invoice_id)) OVER (PARTITION BY region)) AS avg_invoices_by_blacksmith
+FROM blacksmiths_in_westeros
+GROUP BY blacksmith_id, region
+ORDER BY avg_invoices_by_blacksmith DESC;
 
 
 --Check total number of blacksmiths in each region
@@ -74,6 +101,7 @@ SELECT COUNT(DISTINCT blacksmith_id) AS blacksmith_id, region, province
 FROM blacksmiths_in_westeros
 GROUP BY region, province
 ORDER BY blacksmith_id DESC;
+
 
 --Check if number of ID and number of names matches
 SELECT COUNT(DISTINCT(blacksmith_id)) AS num_blacksmith_ids, COUNT(DISTINCT(blacksmith_name)) AS num_blacksmith_names
@@ -119,6 +147,13 @@ FROM
 LIMIT 10;
 
 
+--average invoice amount for each supplier
+SELECT supplier, ROUND(AVG(invoice_amount),2) as invoice_amount_medio
+FROM blacksmiths_in_westeros
+GROUP BY supplier
+ORDER BY invoice_amount_medio DESC;
+
+
 --Number of blacksmiths provided by each supplier
 SELECT supplier, COUNT(DISTINCT blacksmith_id) as number_blacksmiths
 FROM blacksmiths_in_westeros
@@ -150,6 +185,32 @@ GROUP BY number_regions
 ORDER BY number_regions DESC;
 
 
+--Counting how many suppliers supply a set number of regions (in this case 1)
+SELECT COUNT(supplier) AS suppliers
+FROM
+	(SELECT supplier, COUNT(DISTINCT region) as regions
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier) AS reg
+WHERE regions = 1
+GROUP BY regions
+ORDER BY regions DESC;
+
+
+--Number of unique suppliers who supply each region in Westeros, but only for regions that are supplied by a single supplier.
+WITH regions_per_supplier AS (
+	SELECT supplier, COUNT(DISTINCT region) AS num_regions
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+)
+SELECT region, COUNT(DISTINCT b.supplier) AS num_fornitori
+FROM blacksmiths_in_westeros AS b
+JOIN regions_per_supplier AS r 
+ON b.supplier = r.supplier
+WHERE num_regions = 1
+GROUP BY region
+ORDER BY num_fornitori DESC;
+
+
 --Top 10 suppliers by number of invoices with details on total amount
 SELECT supplier, ROUND(SUM(invoice_amount),2) as total, COUNT(invoice_id) AS number_invoices, COUNT(DISTINCT region) AS regions
 FROM blacksmiths_in_westeros
@@ -177,4 +238,34 @@ SELECT supplier, invoice_date, COUNT(invoice_id) as number_invoices, ROUND(AVG(i
 FROM blacksmiths_in_westeros
 GROUP BY supplier, invoice_date
 ORDER BY supplier, invoice_date ASC;
+
+
+--Join with regions database to generate locations for regional number of invoices and regional total amount
+SELECT DISTINCT b.region, COUNT(b.invoice_id) AS number_invoices, SUM(b.invoice_amount) as total_amount, r.latitude, r.longitude
+FROM blacksmiths_in_westeros AS b
+INNER JOIN regions AS r
+ON b.region = r.region
+GROUP BY b.region, latitude, longitude;
+
+
+--Relationshiop between population and number of invoices in each region
+SELECT b.region, COUNT(b.invoice_id::numeric) AS total_invoice_id, r.population, ROUND(COUNT(b.invoice_id::numeric) / (r.population::numeric),2) AS invoice_id_per_person
+FROM blacksmiths_in_westeros AS b
+INNER JOIN regions AS r
+ON b.region = r.region
+GROUP BY b.region, r.population
+ORDER BY invoice_id_per_person DESC;
+
+
+--Relationshiop between population and total amount in each region
+SELECT DISTINCT b.region, ROUND(SUM(b.invoice_amount::numeric), 2) AS total_invoice_id, r.population, ROUND(SUM(b.invoice_amount::numeric) / (r.population::numeric),2) AS invoice_amount_per_person 
+FROM blacksmiths_in_westeros AS b
+INNER JOIN regions AS r
+ON b.region = r.region
+GROUP BY b.region, r.population
+ORDER BY invoice_amount_per_person DESC;
+
+
+--
+
 
