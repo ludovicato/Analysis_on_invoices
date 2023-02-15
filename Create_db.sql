@@ -38,6 +38,7 @@ VALUES
 --Create the database
 CREATE TABLE regions (
 	region VARCHAR,
+	population INT,
 	latitude NUMERIC,
 	longitude NUMERIC
 );
@@ -45,6 +46,6 @@ CREATE TABLE regions (
 --Insert 3 rows of random data in the regions database
 INSERT INTO regions (region, latitude, longitude)
 VALUES 
-	('The North', 48.864716, 2.349014),
-	('The Crownlands', 40.712776, -74.005974),
-	('The Riverlands', 51.507351, -0.127758);
+	('The North', 3200000, 48.864716, 2.349014),
+	('The Crownlands', 1700000, 40.712776, -74.005974),
+	('The Riverlands', 2200000, 51.507351, -0.127758);
