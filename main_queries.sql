@@ -147,6 +147,28 @@ FROM
 LIMIT 10;
 
 
+--Top 10 suppliers by total invoice and their corresponding number of distinct regions
+WITH top_ten_suppliers AS (
+	SELECT DISTINCT supplier, SUM(invoice_amount) AS total_invoice
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+	ORDER BY total_invoice DESC
+	LIMIT 10
+),
+number_of_regions AS (
+	SELECT supplier, COUNT(DISTINCT region) AS regions
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+)
+SELECT DISTINCT t.supplier, n.regions
+FROM blacksmiths_in_westeros AS b
+JOIN top_ten_suppliers AS t 
+ON b.supplier = t.supplier
+JOIN number_of_regions AS n
+ON b.supplier = n.supplier
+ORDER BY n.regions DESC;
+
+
 --average invoice amount for each supplier
 SELECT supplier, ROUND(AVG(invoice_amount),2) as invoice_amount_medio
 FROM blacksmiths_in_westeros
