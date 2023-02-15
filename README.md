@@ -1,9 +1,10 @@
 **Introduction**<br>
-...
+I worked on this project during my internship at Qwince. The project is based on real data but, to preserve the anonimity, I'll replace the real content with
 
 **Database description**<br>
-...
-![Alt text](https://raw.githubusercontent.com/<user>/<repo>/<branch>/path/to/image.jpg)
+...<img width="1146" alt="preview" src="https://user-images.githubusercontent.com/119680854/219099204-d3488f4c-0343-43a5-923c-bb7ce21d77ca.png">
+
+
 
 **Highlights**<br>
 ...
