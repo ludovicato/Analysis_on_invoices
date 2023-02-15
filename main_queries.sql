@@ -42,6 +42,13 @@ FROM blacksmiths_in_westeros
 GROUP BY months;
 
 
+--Check total number of invoices by city
+SELECT city, count(*)
+FROM blacksmiths_in_westeros
+GROUP BY city
+ORDER BY count DESC;
+
+
 --Check total number of blacksmiths in each region
 SELECT COUNT(DISTINCT blacksmith_id) AS num, region
 FROM blacksmiths_in_westeros
@@ -73,12 +80,70 @@ ORDER BY name;
 
 
 --Check if there can be more names associated with one id
-SELECT blacksmith_id, blacksmith_name AS name, region, province
+SELECT blacksmith_id, blacksmith_name AS name, region, province, city
 FROM blacksmiths_in_westeros
-WHERE blacksmith_id IN(
-	SELECT blacksmith_id
+WHERE blacksmith_name IN(
+	SELECT blacksmith_name
 	FROM blacksmiths_in_westeros
-	GROUP BY blacksmith_id
-	HAVING COUNT(DISTINCT blacksmith_name) > 1)
-GROUP BY name, region, province, blacksmith_id
-ORDER BY blacksmith_id;
+	GROUP BY blacksmith_name
+	HAVING COUNT(DISTINCT blacksmith_id) > 1)
+GROUP BY blacksmith_id, name, region, province, city
+ORDER BY name;
+
+
+--Check number of suppliers
+SELECT COUNT(DISTINCT(supplier)) AS fornitori
+FROM blacksmiths_in_westeros;
+
+
+--Top 10 suppliers by total invoice amount
+SELECT supplier, total_spending || ' millions' AS tot
+FROM
+	(SELECT supplier, ROUND(SUM(invoice_amount)/1000000, 2) as total_spending
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+	ORDER BY total_spending DESC) AS test
+LIMIT 10;
+
+
+--Number of blacksmiths provided by each supplier
+SELECT supplier, COUNT(DISTINCT blacksmith_id) as num_farmacie
+FROM blacksmiths_in_westeros
+GROUP BY supplier
+ORDER BY num_farmacie DESC;
+
+
+--Number of suppliers each blacksmiths has
+SELECT blacksmith_id, COUNT(DISTINCT supplier) as num_fornitori
+FROM blacksmiths_in_westeros
+GROUP BY blacksmith_id
+ORDER BY num_fornitori DESC;
+
+
+--Number of regions each supplier works in
+SELECT supplier, COUNT(DISTINCT region) as regioni
+FROM blacksmiths_in_westeros
+GROUP BY supplier
+ORDER BY regioni DESC;
+
+
+--Distribution of suppliers across different regions of operation
+SELECT DISTINCT(regioni) AS num_regioni_fornite, COUNT(supplier) AS forn
+FROM
+	(SELECT supplier, COUNT(DISTINCT region) as regioni
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier) AS reg
+GROUP BY num_regioni_fornite
+ORDER BY num_regioni_fornite DESC;
+
+
+--Top 10 suppliers by number of invoices with details on total amount
+SELECT supplier, ROUND(SUM(invoice_amount),2) as totale_importi, COUNT(invoice_id) AS numero_fatture, COUNT(DISTINCT region) AS regioni
+FROM blacksmiths_in_westeros
+GROUP BY supplier
+ORDER BY numero_fatture DESC
+LIMIT 10;
+
+
+
+
