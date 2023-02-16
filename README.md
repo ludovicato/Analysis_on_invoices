@@ -1,8 +1,9 @@
 **Introduction**<br>
 During my internship at Qwince, I had the opportunity to work on this project. 
 I will showcase here my code and analysis, however, to maintain the confidentiality of my research, I have chosen not to disclose the real subject and location.
-For the purposes of this presentation, I'll be referring to my research as an **analysis on blacksmith business in the Game of Thrones universe**.
+For the purposes of this presentation, I'll be referring to my research as 
 
+# <center>An Analysis on Blacksmith Business in the Game of Thrones Universe</center>
 
 
 
