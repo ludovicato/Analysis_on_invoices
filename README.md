@@ -25,7 +25,7 @@ I also intend to acquire and analyze the content of the invoices to categorize t
 
 
 ## Highlights<br>
-Here, you can find some of the key highlights of the code I use and view examples of the results. To explore the rest of the code, you can access it from this [link](https://raw.githubusercontent.com/ludovicato/Blacksmiths_invoices/main/main_queries.sql?token=GHSAT0AAAAAAB52DEQZFGEG5DX2SYXEHFHMY7PMNHQ) or check the other documents in this repository. 
+Here, you can find some of the key highlights of the code I use and view examples of the results. To explore the rest of the code, you can access it from this [link](https://github.com/ludovicato/SQL_Analysis_Blacksmiths_in_Westeros/blob/92cffb3e584766b9728a88922ca8091d0241c7c5/main_queries.sql) or check the other documents in this repository. 
 
 ![1](https://user-images.githubusercontent.com/119680854/219635907-d65680dd-7646-4275-a0a5-7e74dd385c29.png)
 
