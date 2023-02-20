@@ -319,3 +319,69 @@ FROM ranked_data
 WHERE regions = 1
 ORDER BY ranking;
 
+
+--Top suppliers by total invoice value that have sold their products in 1 region, with their global rank and the region they have supplied
+WITH ranked_data AS (
+	SELECT 
+		supplier, 
+		ROUND(SUM(invoice_amount)) AS total_amount, 
+		COUNT(invoice_id) AS invoices, 
+		COUNT(DISTINCT region) AS regions,
+		row_number() OVER (ORDER BY SUM(invoice_amount) DESC) AS ranking
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+), supplier_regions AS (
+	SELECT 
+		supplier,
+		string_agg(DISTINCT region, ', ') AS regions_supplied
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+)
+SELECT 
+	ranked_data.supplier, 
+	ranked_data.total_amount, 
+	ranked_data.ranking,
+	supplier_regions.regions_supplied
+FROM ranked_data
+JOIN supplier_regions ON ranked_data.supplier = supplier_regions.supplier
+WHERE ranked_data.regions = 1
+ORDER BY ranked_data.ranking;
+
+
+
+
+--Top suppliers by total invoice value that have sold their products in 8 regions, with their global rank and the region they haven't supplied
+WITH all_regions AS (
+	SELECT DISTINCT region
+	FROM blacksmiths_in_westeros
+), ranked_data AS (
+	SELECT 
+		supplier, 
+		ROUND(SUM(invoice_amount)) AS total_amount, 
+		COUNT(invoice_id) AS invoices, 
+		COUNT(DISTINCT region) AS regions,
+		row_number() OVER (ORDER BY SUM(invoice_amount) DESC) AS ranking
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+), supplier_regions AS (
+	SELECT 
+		supplier,
+		string_agg(DISTINCT region, ', ') AS regions_supplied
+	FROM blacksmiths_in_westeros
+	GROUP BY supplier
+)
+SELECT 
+	ranked_data.supplier, 
+	ranked_data.total_amount, 
+	ranked_data.ranking,
+	string_agg(DISTINCT all_regions.region, ', ') AS missing_region
+FROM ranked_data
+JOIN supplier_regions ON ranked_data.supplier = supplier_regions.supplier
+CROSS JOIN all_regions
+WHERE all_regions.region NOT IN 
+	(SELECT region 
+	 FROM blacksmiths_in_westeros 
+	 WHERE supplier = ranked_data.supplier)
+GROUP BY ranked_data.supplier, ranked_data.total_amount, ranked_data.ranking, ranked_data.regions
+HAVING ranked_data.regions = 8
+ORDER BY ranked_data.ranking;
